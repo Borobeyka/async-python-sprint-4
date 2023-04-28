@@ -10,4 +10,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-RUN chmod a+x app_start.sh
+RUN chmod 777 app_start.sh

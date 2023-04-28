@@ -2,6 +2,6 @@
 
 alembic upgrade head
 
-cd src
+cd "src"
 
-uvicorn main:app --host 127.0.0.1 --port 8080
+python main.py
