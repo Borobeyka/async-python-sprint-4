@@ -1,9 +1,15 @@
 import uuid
-from typing import Dict, Optional
 from fastapi import HTTPException
 from sqlalchemy import and_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.batch_link import BatchLink
+from models.reponse_models import (
+    ResponseCreatedLinks,
+    ResponseDBConnection,
+    ResponseDeleteLink,
+    ResponseLinkStats,
+    ResponseLinkURL
+)
 
 from services.logger import logger
 from core.config import config
@@ -15,7 +21,7 @@ class LinkService():
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_stats(self, short_url: str) -> Dict:
+    async def get_stats(self, short_url: str) -> ResponseLinkStats:
         logger_prefix = f"Request statistics for \"{config.app_prefix}{short_url}\""
         statement = (
             select(LinkModel)
@@ -26,9 +32,9 @@ class LinkService():
             logger.debug(f"{logger_prefix}, status: 404 Not found")
             raise HTTPException(status_code=404)
         logger.debug(f"{logger_prefix}, status: OK")
-        return obj.__dict__
+        return ResponseLinkStats(**obj.__dict__)
 
-    async def delete_link(self, short_url: str) -> Dict[str, str]:
+    async def delete_link(self, short_url: str) -> ResponseDeleteLink:
         logger_prefix = f"Delete link \"{config.app_prefix}{short_url}\""
         statement = (
             update(LinkModel)
@@ -38,11 +44,11 @@ class LinkService():
         await self.session.execute(statement=statement)
         await self.session.commit()
         logger.debug(f"{logger_prefix}, status: OK")
-        return {
-            "status": "OK"
-        }
+        return ResponseDeleteLink(
+            status="OK"
+        )
 
-    async def get_link(self, short_url: str) -> Optional[Dict[str, str]]:
+    async def get_link(self, short_url: str) -> ResponseLinkURL:
         logger_prefix = f"Request original link for \"{config.app_prefix}{short_url}\""
         statement = (
             select(LinkModel)
@@ -61,9 +67,9 @@ class LinkService():
         obj.redirects += 1
         await self.session.commit()
         logger.debug(f"{logger_prefix}, status: OK")
-        return {
-            "original_url": obj.original_url
-        }
+        return ResponseLinkURL(
+            original_url=obj.original_url
+        )
 
     async def create_links(self, batch: BatchLink):
         result = []
@@ -76,17 +82,15 @@ class LinkService():
             await self.session.commit()
             logger.debug(f"Create short link for \"{link.original_url}\", status: OK")
             result.append(ShortLink(url=f"{config.app_prefix}{link.short_url}"))
-        return {
-            "status": "OK",
-            "links": [
-                {"url": short_link.url} for short_link in result
-            ]
-        }
+        return ResponseCreatedLinks(
+            status="OK",
+            links=[{"url": short_link.url} for short_link in result]
+        )
 
-    async def check_connection(self) -> Dict[str, str]:
+    async def check_connection(self) -> ResponseDBConnection:
         res = await self.session.execute(statement=select(LinkModel))
         status = "OK" if res else "DOWN"
         logger.debug(f"Check connection to DB, status: {status}")
-        return {
-            "status": status
-        }
+        return ResponseDBConnection(
+            status=status
+        )

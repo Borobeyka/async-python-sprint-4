@@ -19,7 +19,7 @@ class AppConfig(BaseSettings):
         return f"{self.app_host}:{self.app_port}/api/"
 
     class Config:
-        env_file = '.env'
+        env_file = '.env.example'
 
 
 config = AppConfig()

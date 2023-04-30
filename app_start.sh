@@ -1,7 +1,5 @@
 #!/bin/bash
 
 alembic upgrade head
-
-cd "src"
-
+cd src
 python main.py

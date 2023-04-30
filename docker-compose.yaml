@@ -6,9 +6,9 @@ services:
     container_name: app
     command: sh app_start.sh
     env_file:
-      - .env
+      - .env.example
     ports:
-      - 9999:${APP_PORT}
+      - ${APP_PORT_EXTERNAL}:${APP_PORT}
     depends_on:
       db_postgre:
         condition: service_healthy
@@ -17,7 +17,7 @@ services:
     image: postgres:14
     container_name: db_postgres
     ports:
-      - 5454:${DATABASE_PORT}
+      - ${DATABASE_PORT_EXTERNAL}:${DATABASE_PORT}
     environment:
       - POSTGRES_DB=${DATABASE_NAME}
       - POSTGRES_USER=${DATABASE_USER}

@@ -9,7 +9,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from dotenv import load_dotenv
 
-load_dotenv(".env")
+load_dotenv(".env.example")
 sys.path.append("./src")
 
 from models.link_model import Base, LinkModel
