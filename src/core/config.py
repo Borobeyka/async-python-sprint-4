@@ -16,7 +16,7 @@ class AppConfig(BaseSettings):
 
     @property
     def app_prefix(self):
-        return f"{self.app_host}:{self.app_port}/api/"
+        return f"{self.app_host}:{self.app_port}/api"
 
     class Config:
         env_file = '.env.example'

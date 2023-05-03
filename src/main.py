@@ -15,10 +15,15 @@ app = FastAPI(
 
 app.include_router(base.url_router, prefix="/api")
 
-if __name__ == "__main__":
+
+def start_server():
     uvicorn.run(
         "main:app",
         host=config.app_host,
         port=config.app_port,
         reload=True,
     )
+
+
+if __name__ == "__main__":
+    start_server()

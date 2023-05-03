@@ -22,7 +22,7 @@ class LinkService():
         self.session = session
 
     async def get_stats(self, short_url: str) -> ResponseLinkStats:
-        logger_prefix = f"Request statistics for \"{config.app_prefix}{short_url}\""
+        logger_prefix = f"Request statistics for \"{config.app_prefix}/short_url\""
         statement = (
             select(LinkModel)
             .where(LinkModel.short_url == short_url) # noqa E712
@@ -35,7 +35,7 @@ class LinkService():
         return ResponseLinkStats(**obj.__dict__)
 
     async def delete_link(self, short_url: str) -> ResponseDeleteLink:
-        logger_prefix = f"Delete link \"{config.app_prefix}{short_url}\""
+        logger_prefix = f"Delete link \"{config.app_prefix}/{short_url}\""
         statement = (
             update(LinkModel)
             .where(LinkModel.short_url == short_url) # noqa E712
@@ -49,7 +49,7 @@ class LinkService():
         )
 
     async def get_link(self, short_url: str) -> ResponseLinkURL:
-        logger_prefix = f"Request original link for \"{config.app_prefix}{short_url}\""
+        logger_prefix = f"Request original link for \"{config.app_prefix}/{short_url}\""
         statement = (
             select(LinkModel)
             .where(
@@ -81,7 +81,7 @@ class LinkService():
             self.session.add(link)
             await self.session.commit()
             logger.debug(f"Create short link for \"{link.original_url}\", status: OK")
-            result.append(ShortLink(url=f"{config.app_prefix}{link.short_url}"))
+            result.append(ShortLink(url=f"{config.app_prefix}/{link.short_url}"))
         return ResponseCreatedLinks(
             status="OK",
             links=[{"url": short_link.url} for short_link in result]
